@@ -30,4 +30,4 @@ jobs:
 
       - name: Run Django tests
         run: |
-          python manage.py test investment_system
+          python manage.py test investment_backend
