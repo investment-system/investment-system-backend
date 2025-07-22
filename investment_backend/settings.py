@@ -28,7 +28,6 @@ INSTALLED_APPS = [
 
     # Local apps
     'transactions',
-    # 'users',
 ]
 
 MIDDLEWARE = [
