@@ -36,7 +36,14 @@ class Transaction(models.Model):
         if not self.transaction_code:
             last_transaction = Transaction.objects.order_by('-transaction_id').first()
             next_id = (last_transaction.transaction_id if last_transaction else 0) + 1
-            self.transaction_code = f"TKM{next_id:04d}"
+
+            # Set prefix based on source_type
+            prefix = "TKM"  # default
+            if self.source_type == 'share':
+                prefix = "STKM"
+
+            self.transaction_code = f"{prefix}{next_id:04d}"
+
         super().save(*args, **kwargs)
 
     def __str__(self):

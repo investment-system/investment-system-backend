@@ -3,6 +3,5 @@ from .models import Transaction
 
 @admin.register(Transaction)
 class TransactionAdmin(admin.ModelAdmin):
-    list_display = ('transaction_id', 'source_type', 'direction', 'amount', 'payment_method', 'created_at')
-    list_filter = ('source_type', 'direction', 'payment_method')
-    search_fields = ('transaction_id', 'reference_id')
+    list_display = ['transaction_code', 'source_type', 'direction', 'amount', 'member_id']
+    readonly_fields = ['transaction_code', 'created_at']
