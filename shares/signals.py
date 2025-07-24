@@ -1,17 +1,43 @@
+# shares/signals.py
+
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from datetime import date
 from shares.models import ShareRecord
 from profits.models import ProfitPayout
+from cancels.models import CancellationRecord  # ✅ updated import
+from transactions.models import Transaction  # Optional, used in refund
 
+# --- ProfitPayout logic ---
 @receiver(post_save, sender=ShareRecord)
-def create_profit_payout(sender, instance, created, **kwargs):
-    if instance.status == 'completed':
-        if not ProfitPayout.objects.filter(share_record=instance).exists():
-            original_transaction = instance.received_transaction
+def handle_profit_payout(sender, instance, created, **kwargs):
+    today = date.today()
 
-            ProfitPayout.objects.create(
-                transaction=original_transaction,
-                share_record=instance,
-                payout_type='pending',
-                profit_rate=instance.share_return_rate,
-            )
+    if instance.profit_payout_created:
+        return
+
+    # If status is completed, create profit payout
+    if instance.status == 'completed':
+        create_profit_payout(instance)
+
+    # Auto-complete if maturity reached
+    elif instance.status == 'active' and instance.expected_share_maturity_date == today:
+        instance.status = 'completed'
+        instance.save(update_fields=['status'])
+
+def create_profit_payout(share):
+    if not ProfitPayout.objects.filter(share_record=share).exists():
+        ProfitPayout.objects.create(
+            share_record=share,
+            transaction=share.received_transaction,
+            payout_type='pending',
+            profit_rate=share.share_return_rate
+        )
+        share.profit_payout_created = True
+        share.save(update_fields=['profit_payout_created'])
+
+# --- Cancellation logic ---
+@receiver(post_save, sender=ShareRecord)
+def handle_cancellation_record(sender, instance, **kwargs):
+    if instance.status == 'cancelled':
+        CancellationRecord.objects.get_or_create(share=instance)
