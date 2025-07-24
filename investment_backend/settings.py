@@ -27,7 +27,7 @@ INSTALLED_APPS = [
     'corsheaders',
 
     # Local apps
-    'transactions',
+    'transactions.apps.TransactionsConfig',  # not just 'transactions'
     'shares',
     'profits',
     'cancels'

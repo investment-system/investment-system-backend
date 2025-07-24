@@ -28,8 +28,8 @@ class Transaction(models.Model):
     source_type = models.CharField(max_length=20, choices=SOURCE_TYPE_CHOICES)
     reference_id = models.CharField(max_length=50, blank=True, null=True)
     direction = models.CharField(max_length=10, choices=DIRECTION_CHOICES, default='in')
-    amount = models.DecimalField(max_digits=12, decimal_places=2)
-    payment_method = models.CharField(max_length=20, choices=PAYMENT_METHOD_CHOICES)
+    amount = models.DecimalField(max_digits=12, decimal_places=2, default=250.00)
+    payment_method = models.CharField(max_length=20, choices=PAYMENT_METHOD_CHOICES, default='bank_transfer')
     created_at = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
@@ -50,4 +50,3 @@ class Transaction(models.Model):
 
     def __str__(self):
         return f"{self.transaction_code} | {self.source_type} | {self.direction} | RM {self.amount}"
-
