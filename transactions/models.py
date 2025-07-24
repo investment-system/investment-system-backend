@@ -8,6 +8,7 @@ class Transaction(models.Model):
         ('share', 'Share'),
         ('payment', 'Payment'),
         ('cancellation', 'Cancellation'),
+        ('registration_payments', 'Registration Payment'),
     ]
 
     DIRECTION_CHOICES = [
@@ -25,7 +26,7 @@ class Transaction(models.Model):
     transaction_id = models.AutoField(primary_key=True)
     transaction_code = models.CharField(max_length=20, unique=True, blank=True, editable=False)
     member_id = models.IntegerField(null=True, blank=True)
-    source_type = models.CharField(max_length=20, choices=SOURCE_TYPE_CHOICES)
+    source_type = models.CharField(max_length=50, choices=SOURCE_TYPE_CHOICES)
     reference_id = models.CharField(max_length=50, blank=True, null=True)
     direction = models.CharField(max_length=10, choices=DIRECTION_CHOICES, default='in')
     amount = models.DecimalField(max_digits=12, decimal_places=2, default=250.00)
@@ -40,6 +41,7 @@ class Transaction(models.Model):
                 'cancellation': 'CTKM',
                 'withdrawal': 'WTKM',
                 'deposit': 'DTKM',
+                'registration_payments': 'RTKM',
             }.get(self.source_type, 'TKM')
 
             last = Transaction.objects.filter(source_type=self.source_type).order_by('-transaction_id').first()

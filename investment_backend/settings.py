@@ -30,7 +30,8 @@ INSTALLED_APPS = [
     'transactions.apps.TransactionsConfig',  # not just 'transactions'
     'shares',
     'profits',
-    'cancels'
+    'cancels',
+    'registrations',
 ]
 
 MIDDLEWARE = [
