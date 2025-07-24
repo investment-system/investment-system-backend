@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     'transactions',
     'shares',
     'profits',
+    'cancels'
 ]
 
 MIDDLEWARE = [
