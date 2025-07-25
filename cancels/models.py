@@ -30,7 +30,7 @@ class CancellationRecord(models.Model):
         # Step 2: Generate cancellation code if not set
         if not self.cancellation_code:
             last_id = CancellationRecord.objects.count() + 1
-            self.cancellation_code = f"RFKM{last_id:04d}"
+            self.cancellation_code = f"RFCKM{last_id:04d}"
 
         is_new = self._state.adding  # New record?
 
