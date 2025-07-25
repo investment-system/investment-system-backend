@@ -32,10 +32,11 @@ INSTALLED_APPS = [
     'profits',
     'cancels',
     'registrations',
+    'administrators',
     # 'members',
 ]
 
-# AUTH_USER_MODEL = 'members.Member'
+AUTH_USER_MODEL = 'administrators.Administrator'
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -100,7 +101,7 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.AllowAny',
+        'rest_framework.permissions.IsAuthenticated',
     ],
     'DEFAULT_RENDERER_CLASSES': [
         'rest_framework.renderers.JSONRenderer',
