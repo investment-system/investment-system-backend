@@ -1,5 +1,7 @@
 # transactions/models.py
 from django.db import models
+from django.utils import timezone  # ✅ Required for timezone.now()
+
 
 class Transaction(models.Model):
     SOURCE_TYPE_CHOICES = [
@@ -24,7 +26,7 @@ class Transaction(models.Model):
     ]
 
     transaction_id = models.AutoField(primary_key=True)
-    transaction_code = models.CharField(max_length=20, unique=True, blank=True, editable=False)
+    transaction_code = models.CharField(max_length=30, unique=True, blank=True, editable=False)
     member_id = models.IntegerField(null=True, blank=True)
     source_type = models.CharField(max_length=50, choices=SOURCE_TYPE_CHOICES)
     reference_id = models.CharField(max_length=50, blank=True, null=True)
@@ -44,9 +46,12 @@ class Transaction(models.Model):
                 'registration_payments': 'RTKM',
             }.get(self.source_type, 'TKM')
 
-            last = Transaction.objects.filter(source_type=self.source_type).order_by('-transaction_id').first()
-            next_id = (last.transaction_id if last else 0) + 1
-            self.transaction_code = f"{prefix}{next_id:04d}"
+            today_str = timezone.now().strftime("%Y%m%d")
+            count_today = Transaction.objects.filter(
+                transaction_code__startswith=f"{prefix}-{today_str}"
+            ).count() + 1
+
+            self.transaction_code = f"{prefix}-{today_str}-{count_today:04d}"
 
         super().save(*args, **kwargs)
 
