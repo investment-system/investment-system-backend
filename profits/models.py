@@ -31,8 +31,7 @@ class ProfitPayout(models.Model):
 
     @property
     def original_amount(self):
-        return self.share_record.received_transaction.amount if self.share_record and self.share_record.received_transaction else Decimal(
-            '0.00')
+        return self.share_record.received_transaction.amount if self.share_record and self.share_record.received_transaction else Decimal('0.00')
 
     def save(self, *args, **kwargs):
         original = self.original_amount
@@ -48,4 +47,21 @@ class ProfitPayout(models.Model):
 
         super().save(*args, **kwargs)
 
-        create_reinvestment(self)  # ← simplified call
+        # ✅ Create profit payout transaction (to member) if needed
+        if self.payout_type in ['partial', 'full_transfer']:
+            if not Transaction.objects.filter(reference_id=f"PROFIT-{self.pk}").exists():
+                Transaction.objects.create(
+                    member_id=self.transaction.member_id,
+                    amount=self.refund_amount,
+                    source_type='payment',
+                    direction='out',
+                    payment_method='bank_transfer',
+                    reference_id=f"PROFIT-{self.pk}",
+                    created_at=timezone.now(),
+                )
+
+        # ✅ Handle reinvestment (only for partial/reinvest)
+        create_reinvestment(self)
+
+    def __str__(self):
+        return f"Payout {self.payout_id} - {self.payout_type} - RM{self.refund_amount}"

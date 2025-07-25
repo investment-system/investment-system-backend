@@ -1,4 +1,3 @@
-from datetime import date, timedelta
 from django.utils import timezone
 from decimal import Decimal
 from transactions.models import Transaction
@@ -22,7 +21,8 @@ def create_reinvestment(payout):
     else:
         return False  # Not a reinvestment type
 
-    new_transaction = Transaction.objects.create(
+    # Create reinvestment transaction
+    Transaction.objects.create(
         member_id=payout.transaction.member_id,
         amount=reinvest_amount,
         source_type='share',
