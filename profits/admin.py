@@ -7,6 +7,7 @@ class ProfitPayoutAdmin(admin.ModelAdmin):
         'payout_id',
         'payout_type',
         'get_original_amount',
+        'payout_type',
         'profit_rate',
         'profit_amount',
         'refund_amount',
