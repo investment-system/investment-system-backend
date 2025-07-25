@@ -29,8 +29,11 @@ class CancellationRecord(models.Model):
 
         # Step 2: Generate cancellation code if not set
         if not self.cancellation_code:
-            last_id = CancellationRecord.objects.count() + 1
-            self.cancellation_code = f"RFCKM{last_id:04d}"
+            today_str = timezone.now().strftime("%Y%m%d")
+            count_today = CancellationRecord.objects.filter(
+                cancellation_code__startswith=f"RFCKM{today_str}"
+            ).count() + 1
+            self.cancellation_code = f"RFCKM-{today_str}-{count_today:04d}"
 
         is_new = self._state.adding  # New record?
 
