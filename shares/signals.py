@@ -1,12 +1,10 @@
-# shares/signals.py
-
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from datetime import date
 from shares.models import ShareRecord
 from profits.models import ProfitPayout
-from cancels.models import CancellationRecord  # ✅ updated import
-from transactions.models import Transaction  # Optional, used in refund
+from cancels.models import CancellationRecord
+from transactions.models import Transaction
 
 # --- ProfitPayout logic ---
 @receiver(post_save, sender=ShareRecord)
@@ -36,7 +34,6 @@ def create_profit_payout(share):
         share.profit_payout_created = True
         share.save(update_fields=['profit_payout_created'])
 
-# --- Cancellation logic ---
 @receiver(post_save, sender=ShareRecord)
 def handle_cancellation_record(sender, instance, **kwargs):
     if instance.status == 'cancelled':

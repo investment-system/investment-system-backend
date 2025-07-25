@@ -32,7 +32,10 @@ INSTALLED_APPS = [
     'profits',
     'cancels',
     'registrations',
+    # 'members',
 ]
+
+# AUTH_USER_MODEL = 'members.Member'
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
