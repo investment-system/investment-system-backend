@@ -4,11 +4,14 @@ from django.contrib.auth import authenticate
 
 
 class AdminRegisterSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True)
+    password = serializers.CharField(write_only=True, min_length=8)
 
     class Meta:
         model = Administrator
         fields = ['email', 'full_name', 'password']
+        extra_kwargs = {
+            'full_name': {'required': False, 'allow_blank': True}
+        }
 
     def create(self, validated_data):
         return Administrator.objects.create_user(**validated_data)
@@ -16,7 +19,7 @@ class AdminRegisterSerializer(serializers.ModelSerializer):
 
 class AdminLoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
-    password = serializers.CharField()
+    password = serializers.CharField(write_only=True)
 
     def validate(self, data):
         user = authenticate(**data)
@@ -28,12 +31,17 @@ class AdminLoginSerializer(serializers.Serializer):
 class AdminProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Administrator
-        fields = ['email', 'full_name', 'phone']
+        fields = [
+            'admin_code', 'email', 'full_name', 'ic_number', 'gender',
+            'date_of_birth', 'phone_number', 'profile_picture',
+            'role', 'position'
+        ]
+        read_only_fields = ['admin_code', 'email']
 
 
 class AdminPasswordChangeSerializer(serializers.Serializer):
-    old_password = serializers.CharField()
-    new_password = serializers.CharField()
+    old_password = serializers.CharField(write_only=True)
+    new_password = serializers.CharField(write_only=True, min_length=8)
 
     def validate_old_password(self, value):
         user = self.context['request'].user

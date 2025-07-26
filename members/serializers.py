@@ -1,30 +1,27 @@
 from rest_framework import serializers
 from .models import Member
-from django.contrib.auth import authenticate
+from django.contrib.auth.password_validation import validate_password
 
-class RegisterSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True)
+class MemberSignupSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True, validators=[validate_password])
+    member_code = serializers.CharField(read_only=True)
 
     class Meta:
         model = Member
-        fields = ['email', 'password', 'full_name', 'ic_number', 'gender', 'profile_picture']
+        fields = ['email', 'full_name', 'password', 'member_code']
 
     def create(self, validated_data):
         return Member.objects.create_user(**validated_data)
 
 
-class LoginSerializer(serializers.Serializer):
-    email = serializers.EmailField()
-    password = serializers.CharField(write_only=True)
+class MemberProfileSerializer(serializers.ModelSerializer):
+    member_code = serializers.CharField(read_only=True)
 
-    def validate(self, data):
-        user = authenticate(email=data['email'], password=data['password'])
-        if user and user.is_active:
-            return user
-        raise serializers.ValidationError("Invalid credentials")
-
-
-class MemberSerializer(serializers.ModelSerializer):
     class Meta:
         model = Member
-        fields = ['member_id', 'email', 'full_name', 'ic_number', 'gender', 'profile_picture']
+        fields = ['email', 'full_name', 'phone_number', 'address', 'member_code']
+
+
+class ChangePasswordSerializer(serializers.Serializer):
+    old_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True, validators=[validate_password])

@@ -27,13 +27,13 @@ INSTALLED_APPS = [
     'corsheaders',
 
     # Local apps
-    'transactions.apps.TransactionsConfig',  # not just 'transactions'
+    'transactions.apps.TransactionsConfig',
     'shares',
     'profits',
     'cancels',
     'registrations',
     'administrators',
-    # 'members',
+    'members',
 ]
 
 AUTH_USER_MODEL = 'administrators.Administrator'

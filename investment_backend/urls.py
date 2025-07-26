@@ -11,6 +11,6 @@ urlpatterns = [
     path('api/cancels/', include('cancels.urls')),
     path('api/registrations/', include('registrations.urls')),
     path('api/admin/', include('administrators.urls')),
-    # path('api/members/', include('members.urls')),
+    path('api/members/', include('members.urls')),
 
 ]

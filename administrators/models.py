@@ -1,6 +1,7 @@
 from django.db import models
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin, Group, Permission
 from django.utils import timezone
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.db import IntegrityError, transaction
 
 
 class AdminManager(BaseUserManager):
@@ -23,7 +24,6 @@ class Administrator(AbstractBaseUser, PermissionsMixin):
     GENDER_CHOICES = [
         ('male', 'Male'),
         ('female', 'Female'),
-        ('other', 'Other'),
     ]
 
     ROLE_CHOICES = [
@@ -40,7 +40,7 @@ class Administrator(AbstractBaseUser, PermissionsMixin):
 
     admin_code = models.CharField(max_length=30, unique=True, blank=True)
     email = models.EmailField(unique=True)
-    full_name = models.CharField(max_length=255)
+    full_name = models.CharField(max_length=255, blank=True, null=True)
     ic_number = models.CharField(max_length=30, blank=True, null=True)
     gender = models.CharField(max_length=10, choices=GENDER_CHOICES, blank=True, null=True)
     date_of_birth = models.DateField(blank=True, null=True)
@@ -59,17 +59,41 @@ class Administrator(AbstractBaseUser, PermissionsMixin):
     objects = AdminManager()
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['full_name']
+    REQUIRED_FIELDS = []  # full_name is now optional
+
+    groups = models.ManyToManyField(
+        Group,
+        related_name='administrator_users',
+        blank=True
+    )
+
+    user_permissions = models.ManyToManyField(
+        Permission,
+        related_name='administrator_user_permissions',
+        blank=True
+    )
 
     def __str__(self):
         return self.email
 
+    def generate_admin_code(self):
+        today = timezone.now().strftime("%Y%m%d")
+        prefix = "AKM"
+        count_today = Administrator.objects.filter(
+            created_at__date=timezone.now().date()
+        ).count() + 1
+        return f"{prefix}-{today}-{count_today:04d}"
+
     def save(self, *args, **kwargs):
         if not self.admin_code:
-            today = timezone.now().strftime("%Y%m%d")
-            prefix = "AKM"
-            count_today = Administrator.objects.filter(
-                created_at__date=timezone.now().date()
-            ).count() + 1
-            self.admin_code = f"{prefix}-{today}-{count_today:04d}"
-        super().save(*args, **kwargs)
+            for attempt in range(5):  # retry max 5 times
+                try:
+                    self.admin_code = self.generate_admin_code()
+                    with transaction.atomic():
+                        super().save(*args, **kwargs)
+                    return
+                except IntegrityError:
+                    continue
+            raise IntegrityError("Failed to generate a unique admin_code after multiple attempts.")
+        else:
+            super().save(*args, **kwargs)
