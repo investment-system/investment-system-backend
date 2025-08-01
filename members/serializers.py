@@ -1,6 +1,7 @@
 from rest_framework import serializers
-from .models import Member
 from django.contrib.auth.password_validation import validate_password
+from .models import Member
+
 
 class MemberSignupSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, validators=[validate_password])

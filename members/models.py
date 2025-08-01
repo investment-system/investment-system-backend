@@ -1,7 +1,7 @@
+import random
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 from django.db import models, IntegrityError, transaction
 from django.utils import timezone
-
 
 class MemberManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
@@ -18,7 +18,6 @@ class MemberManager(BaseUserManager):
         extra_fields.setdefault("is_superuser", True)
         return self.create_user(email, password, **extra_fields)
 
-
 class Member(AbstractBaseUser, PermissionsMixin):
     MEMBER_CODE_PREFIX = "MBR"
 
@@ -30,6 +29,10 @@ class Member(AbstractBaseUser, PermissionsMixin):
 
     is_active = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
+
+    verification_code = models.CharField(max_length=6, blank=True, null=True)
+    code_created_at = models.DateTimeField(blank=True, null=True)
+
     date_joined = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -43,10 +46,15 @@ class Member(AbstractBaseUser, PermissionsMixin):
 
     def generate_member_code(self):
         today = timezone.now().strftime("%Y%m%d")
-        count_today = Member.objects.filter(
-            date_joined__date=timezone.now().date()
-        ).count() + 1
+        count_today = Member.objects.filter(date_joined__date=timezone.now().date()).count() + 1
         return f"{self.MEMBER_CODE_PREFIX}-{today}-{count_today:04d}"
+
+    def generate_verification_code(self):
+        self.verification_code = f"{random.randint(100000, 999999)}"
+        self.code_created_at = timezone.now()
+        self.save()
+
+
 
     def save(self, *args, **kwargs):
         if not self.member_code:
