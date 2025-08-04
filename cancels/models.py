@@ -2,7 +2,8 @@ from django.db import models
 from shares.models import ShareRecord
 from transactions.models import Transaction
 from django.utils import timezone
-from decimal import Decimal
+from django.db import IntegrityError
+
 
 
 class CancellationRecord(models.Model):
@@ -27,19 +28,27 @@ class CancellationRecord(models.Model):
         self.penalty_amount = round(rate * invested_amount, 2)
         self.refund_amount = round(invested_amount - self.penalty_amount, 2)
 
-        # Step 2: Generate cancellation code if not set
-        if not self.cancellation_code:
-            today_str = timezone.now().strftime("%Y%m%d")
-            count_today = CancellationRecord.objects.filter(
-                cancellation_code__startswith=f"RFCKM{today_str}"
-            ).count() + 1
-            self.cancellation_code = f"RFCKM-{today_str}-{count_today:04d}"
+        is_new = self._state.adding
 
-        is_new = self._state.adding  # New record?
+        if is_new:
+            max_retries = 5
+            for attempt in range(max_retries):
+                today_str = timezone.now().strftime("%Y%m%d")
+                count_today = CancellationRecord.objects.filter(
+                    cancellation_code__startswith=f"RFCKM-{today_str}"
+                ).count() + 1
+                self.cancellation_code = f"RFCKM-{today_str}-{count_today:04d}"
 
-        super().save(*args, **kwargs)
+                try:
+                    super().save(*args, **kwargs)
+                    break  # success
+                except IntegrityError:
+                    if attempt == max_retries - 1:
+                        raise
+        else:
+            super().save(*args, **kwargs)
 
-        # Step 3: Create or update the transaction
+        # Step 3: Create or update transaction
         transaction_data = {
             'member_id': self.share.member_id,
             'amount': self.refund_amount,

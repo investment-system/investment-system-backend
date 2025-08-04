@@ -8,12 +8,16 @@ urlpatterns = [
 
     # Modular app routes
     path('api/', include('transactions.urls')),
-    path('api/', include('shares.urls')),
-    path('api/', include('profits.urls')),
-    path('api/', include('cancels.urls')),
     path('api/', include('registrations.urls')),
-    path('api/', include('administrators.urls')),
+    path('api/', include('shares.urls')),
+    path('api/', include('cancels.urls')),
+    path('api/', include('profits.urls')),
+
+
+
     path('api/', include('members.urls')),
+    path('api/', include('administrators.urls')),
+
 ]
 
 if settings.DEBUG:

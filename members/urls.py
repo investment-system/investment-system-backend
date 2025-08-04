@@ -4,18 +4,20 @@ from .views import (
     SignupView,
     MemberListView,
     MemberDetailView,
+    ProfileView,
+    ChangePasswordView,
     VerifyCodeView,
     ResendCodeView,
-    ActivateAccountView,
-    ProfileView,
-    ChangePasswordView
 )
-
 urlpatterns = [
-    path("members/", MemberListView.as_view(), name="member-list"),
-    path("members/<int:pk>/", MemberDetailView.as_view(), name="member-detail"),
-    path("members/signup/", SignupView.as_view(), name="member-signup"),
-    path("members/login/", MemberLoginView.as_view(), name="member-login"),
-    path("members/profile/", ProfileView.as_view(), name="member-profile"),
-    path("members/change-password/", ChangePasswordView.as_view(), name="change-password"),
+
+    path('member/signup/', SignupView.as_view(), name='member-signup'),
+    path('member/login/', MemberLoginView.as_view(), name='member-login'),
+    path('member/profile/', ProfileView.as_view(), name='member-profile'),
+    path('member/change-password/', ChangePasswordView.as_view(), name='change-password'),
+    path('member/verify-code/', VerifyCodeView.as_view(), name='verify-code'),
+    path('member/resend-code/', ResendCodeView.as_view(), name='resend-code'),
+
+    path('members/', MemberListView.as_view(), name='member-list'),
+    path('members/<int:pk>/', MemberDetailView.as_view(), name='member-detail'),
 ]
