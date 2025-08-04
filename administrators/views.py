@@ -2,7 +2,6 @@ from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
-from .models import Administrator
 from .serializers import (
     AdminRegisterSerializer, AdminLoginSerializer,
     AdminProfileSerializer, AdminPasswordChangeSerializer
@@ -20,7 +19,6 @@ def get_tokens_for_user(user):
 class AdminRegisterView(generics.CreateAPIView):
     serializer_class = AdminRegisterSerializer
 
-
 class AdminLoginView(APIView):
     def post(self, request):
         serializer = AdminLoginSerializer(data=request.data)
@@ -32,14 +30,12 @@ class AdminLoginView(APIView):
             'tokens': tokens
         })
 
-
 class AdminProfileView(generics.RetrieveUpdateAPIView):
     serializer_class = AdminProfileSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_object(self):
         return self.request.user
-
 
 class AdminPasswordChangeView(generics.UpdateAPIView):
     serializer_class = AdminPasswordChangeSerializer

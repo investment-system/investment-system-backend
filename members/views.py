@@ -7,6 +7,10 @@ from django.http import HttpResponse
 from django.views import View
 from django.utils import timezone
 import sendgrid
+from rest_framework.authtoken.models import Token
+from django.contrib.auth import authenticate
+from django.contrib.auth.tokens import default_token_generator
+
 
 from sendgrid.helpers.mail import Mail
 from .models import Member
@@ -17,28 +21,47 @@ from .serializers import (
 )
 from .utils import generate_activation_link, decode_uid
 
+class MemberListView(generics.ListAPIView):
+    queryset = Member.objects.all()
+    serializer_class = MemberProfileSerializer
+    permission_classes = [AllowAny]
+
+class MemberDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Member.objects.all()
+    serializer_class = MemberProfileSerializer
+    permission_classes = [AllowAny]  # or IsAdminUser or custom permissions
+
 class SignupView(generics.CreateAPIView):
     queryset = Member.objects.all()
     serializer_class = MemberSignupSerializer
     permission_classes = [AllowAny]
 
     def perform_create(self, serializer):
-        user = serializer.save(is_active=False)
-        user.generate_verification_code()
+        user = serializer.save(is_active=True)
 
-        message = Mail(
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            to_emails=user.email,
-            subject="Your Verification Code",
-            html_content=f"""
-                Hi {user.full_name or user.email},<br><br>
-                Your verification code is: <strong>{user.verification_code}</strong><br>
-                This code expires in 10 minutes.<br>
-            """
-        )
+class MemberLoginView(APIView):
+    def post(self, request):
+        email = request.data.get("email")
+        password = request.data.get("password")
 
-        sg = sendgrid.SendGridAPIClient(api_key=settings.SENDGRID_API_KEY)
-        sg.send(message)
+        if not email or not password:
+            return Response({"detail": "Email and password required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user = Member.objects.get(email=email)
+        except Member.DoesNotExist:
+            return Response({"detail": "Invalid email or password."}, status=status.HTTP_401_UNAUTHORIZED)
+
+        user = authenticate(request, username=user.username, password=password)
+
+        if not user:
+            return Response({"detail": "Invalid email or password."}, status=status.HTTP_401_UNAUTHORIZED)
+
+        if not user.is_active:
+            return Response({"detail": "Account not activated."}, status=status.HTTP_403_FORBIDDEN)
+
+        token, _ = Token.objects.get_or_create(user=user)
+        return Response({"token": token.key, "user_id": user.id})
 
 class VerifyCodeView(APIView):
     permission_classes = [AllowAny]

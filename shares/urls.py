@@ -1,9 +1,10 @@
+from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import ShareRecordViewSet
 
 router = DefaultRouter()
-router.register(r'share', ShareRecordViewSet, basename='share')
+router.register(r'share-record', ShareRecordViewSet, basename='share')
 
-
-urlpatterns = router.urls
-
+urlpatterns = [
+    path('', include(router.urls)),
+]

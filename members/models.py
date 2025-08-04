@@ -4,6 +4,7 @@ from django.db import models, IntegrityError, transaction
 from django.utils import timezone
 
 class MemberManager(BaseUserManager):
+
     def create_user(self, email, password=None, **extra_fields):
         if not email:
             raise ValueError("Email is required")
@@ -14,24 +15,40 @@ class MemberManager(BaseUserManager):
         return user
 
     def create_superuser(self, email, password=None, **extra_fields):
-        extra_fields.setdefault("is_staff", True)
-        extra_fields.setdefault("is_superuser", True)
+        extra_fields.setdefault("is_staff", False)
+        extra_fields.setdefault("is_superuser", False)
         return self.create_user(email, password, **extra_fields)
 
 class Member(AbstractBaseUser, PermissionsMixin):
+
+    GENDER_CHOICES = (
+        ("male", "Male"),
+        ("female", "Female"),
+    )
+
     MEMBER_CODE_PREFIX = "MBR"
 
     member_code = models.CharField(max_length=30, unique=True, blank=True)
     email = models.EmailField(unique=True)
+
     full_name = models.CharField(max_length=255, blank=True, null=True)
-    phone_number = models.CharField(max_length=20, blank=True)
-    address = models.TextField(blank=True)
+    gender = models.CharField(max_length=10, choices=GENDER_CHOICES)
+    ic_number = models.CharField(max_length=255, blank=True, null=True)
+    date_of_birth = models.DateField(blank=True, null=True)
+    phone_number = models.CharField(max_length=20, blank=True, null=True)
+    country = models.CharField(max_length=100, blank=True, null=True)
+    address_line = models.CharField(max_length=255, blank=True, null=True)
+    city = models.CharField(max_length=100, blank=True, null=True)
+    state = models.CharField(max_length=100, blank=True, null=True)
+
+    bank_name = models.CharField(max_length=100, blank=True, null=True)
+    account_holder_name = models.CharField(max_length=255, blank=True, null=True)
+    bank_account_number = models.CharField(max_length=100, blank=True, null=True)
+
+    profile_picture = models.ImageField(upload_to='profile_pictures/', blank=True, null=True)
 
     is_active = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
-
-    verification_code = models.CharField(max_length=6, blank=True, null=True)
-    code_created_at = models.DateTimeField(blank=True, null=True)
 
     date_joined = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
