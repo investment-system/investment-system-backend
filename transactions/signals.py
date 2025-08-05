@@ -8,7 +8,7 @@ from datetime import timedelta, date
 def create_share_record_if_needed(sender, instance, created, **kwargs):
     if created and instance.source_type == 'share':
         ShareRecord.objects.create(
-            member_id=instance.member_id or 0,  # use 0 or null-safe
+            member=instance.member,
             project_name='KKM',
             share_return_rate=10.0,  # default rate, adjust as needed
             received_transaction=instance,
