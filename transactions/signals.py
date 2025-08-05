@@ -10,7 +10,7 @@ def create_share_record_if_needed(sender, instance, created, **kwargs):
         ShareRecord.objects.create(
             member=instance.member,
             project_name='KKM',
-            share_return_rate=10.0,  # default rate, adjust as needed
+            share_return_rate=10.0,
             received_transaction=instance,
             share_date=date.today(),
             expected_share_maturity_date=date.today() + timedelta(days=365),

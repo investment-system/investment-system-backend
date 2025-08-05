@@ -5,9 +5,7 @@ from datetime import date
 from shares.models import ShareRecord
 from profits.models import ProfitPayout
 from cancels.models import CancellationRecord
-from transactions.models import Transaction
 
-# --- ProfitPayout logic ---
 @receiver(post_save, sender=ShareRecord)
 def handle_profit_payout(sender, instance, created, **kwargs):
     today = date.today()

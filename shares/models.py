@@ -1,6 +1,7 @@
 from django.db import models
 from datetime import date, timedelta
 from transactions.models import Transaction
+from members.models import Member
 
 def default_share_date():
     return date.today()
@@ -16,7 +17,7 @@ class ShareRecord(models.Model):
     ]
 
     share_id = models.AutoField(primary_key=True)
-    member_id = models.IntegerField()
+    member = models.ForeignKey(Member, on_delete=models.SET_NULL, null=True, blank=True, related_name='share_records')
     project_name = models.CharField(max_length=255, default='KKM')
 
     share_date = models.DateField(default=default_share_date)
