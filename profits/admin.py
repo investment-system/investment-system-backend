@@ -5,6 +5,7 @@ from .models import ProfitPayout
 class ProfitPayoutAdmin(admin.ModelAdmin):
     list_display = [
         'payout_id',
+        'member',
         'payout_type',
         'get_original_amount',
         'payout_type',

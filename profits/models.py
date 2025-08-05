@@ -1,11 +1,10 @@
 from django.db import models
 from django.utils import timezone
-from datetime import timedelta, date
 from decimal import Decimal
 from transactions.models import Transaction
 from shares.models import ShareRecord
 from profits.utils import create_reinvestment
-
+from members.models import Member
 
 class ProfitPayout(models.Model):
     PAYOUT_TYPE_CHOICES = [
@@ -16,8 +15,10 @@ class ProfitPayout(models.Model):
     ]
 
     payout_id = models.AutoField(primary_key=True)
+
+    member = models.ForeignKey(Member, on_delete=models.SET_NULL, null=True, blank=True, related_name='profit_payouts')
     transaction = models.ForeignKey(Transaction, on_delete=models.CASCADE)
-    share_record = models.OneToOneField(ShareRecord, on_delete=models.CASCADE)  # Each share can only be paid out once
+    share_record = models.OneToOneField(ShareRecord, on_delete=models.CASCADE)
 
     payout_type = models.CharField(max_length=20, choices=PAYOUT_TYPE_CHOICES, default='pending')
     invoice_file = models.FileField(upload_to='invoices/', blank=True, null=True)
@@ -45,23 +46,30 @@ class ProfitPayout(models.Model):
         elif self.payout_type == 'reinvest':
             self.refund_amount = Decimal('0.00')
 
+        # 🔒 Force the member to match the transaction’s member
+        if self.transaction and self.transaction.member:
+            self.member = self.transaction.member
+
         super().save(*args, **kwargs)
 
         # ✅ Create profit payout transaction (to member) if needed
         if self.payout_type in ['partial', 'full_transfer']:
             if not Transaction.objects.filter(reference_id=f"PROFIT-{self.pk}").exists():
-                Transaction.objects.create(
-                    member_id=self.transaction.member_id,
-                    amount=self.refund_amount,
-                    source_type='payment',
-                    direction='out',
-                    payment_method='bank_transfer',
-                    reference_id=f"PROFIT-{self.pk}",
-                    created_at=timezone.now(),
-                )
+                member = self.transaction.member
+                if member:
+                    Transaction.objects.create(
+                        member=member,
+                        amount=self.refund_amount,
+                        source_type='payment',
+                        direction='out',
+                        payment_method='bank_transfer',
+                        reference_id=f"PROFIT-{self.pk}",
+                        created_at=timezone.now(),
+                    )
 
-        # ✅ Handle reinvestment (only for partial/reinvest)
+        # ✅ Handle reinvestment
         create_reinvestment(self)
+
 
     def __str__(self):
         return f"Payout {self.payout_id} - {self.payout_type} - RM{self.refund_amount}"
