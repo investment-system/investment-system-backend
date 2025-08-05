@@ -18,7 +18,7 @@ class ShareRecord(models.Model):
 
     share_id = models.AutoField(primary_key=True)
     member = models.ForeignKey(Member, on_delete=models.SET_NULL, null=True, blank=True, related_name='share_records')
-    project_name = models.CharField(max_length=255, default='KKM')
+    project_name = models.CharField(max_length=255, default='Katering Koperasi Masjid')
 
     share_date = models.DateField(default=default_share_date)
     share_return_rate = models.DecimalField(max_digits=5, decimal_places=2)
