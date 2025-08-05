@@ -1,7 +1,6 @@
-# transactions/models.py
+from django.utils import timezone
 from django.db import models
-from django.utils import timezone  # ✅ Required for timezone.now()
-
+from members.models import Member
 
 class Transaction(models.Model):
     SOURCE_TYPE_CHOICES = [
@@ -27,7 +26,7 @@ class Transaction(models.Model):
 
     transaction_id = models.AutoField(primary_key=True)
     transaction_code = models.CharField(max_length=30, unique=True, blank=True, editable=False)
-    member_id = models.IntegerField(null=True, blank=True)
+    member = models.ForeignKey(Member, on_delete=models.SET_NULL, null=True, blank=True, related_name='transactions')
     source_type = models.CharField(max_length=50, choices=SOURCE_TYPE_CHOICES)
     reference_id = models.CharField(max_length=50, blank=True, null=True)
     direction = models.CharField(max_length=10, choices=DIRECTION_CHOICES, default='in')
