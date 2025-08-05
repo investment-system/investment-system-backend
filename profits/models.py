@@ -73,16 +73,23 @@ class ProfitPayout(models.Model):
                     # ✅ Send email to the member
                     if member.email:
                         subject = 'Your Profit Payout Has Been Processed'
+
                         message = (
+                            f"Subject: Profit Payout Confirmation\n\n"
                             f"Dear {member.full_name},\n\n"
                             f"We are pleased to inform you that your profit payout has been successfully processed "
-                            f"as a {self.get_payout_type_display()}.\n\n"
-                            f"Payout Amount: RM {self.refund_amount:.2f}\n\n"
+                            f"as a **{self.get_payout_type_display()}**.\n\n"
+                            f"Below are the details of your payout:\n"
+                            f"----------------------------------------\n"
+                            f"• Payout Amount : RM {self.refund_amount:.2f}\n"
+                            f"• Processed On  : {self.updated_at.strftime('%d %B %Y') if self.updated_at else 'N/A'}\n"
+                            f"----------------------------------------\n\n"
                             f"If you have any questions or require further assistance, please do not hesitate to contact us.\n\n"
                             f"Thank you for your continued trust and support.\n\n"
                             f"Warm regards,\n"
-                            f"Koperasi Team"
+                            f"Koperasi Masjid Team"
                         )
+
                         send_mail(
                             subject,
                             message,
