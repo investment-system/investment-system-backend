@@ -29,7 +29,7 @@ class Transaction(models.Model):
     member = models.ForeignKey(Member, on_delete=models.SET_NULL, null=True, blank=True, related_name='transactions')
     source_type = models.CharField(max_length=50, choices=SOURCE_TYPE_CHOICES)
     reference_id = models.CharField(max_length=50, blank=True, null=True)
-    direction = models.CharField(max_length=10, choices=DIRECTION_CHOICES, default='in')
+    direction = models.CharField(max_length=15, choices=DIRECTION_CHOICES, default='in')
     amount = models.DecimalField(max_digits=12, decimal_places=2, default=250.00)
     received_invoice_doc = models.FileField(upload_to='received_invoice_doc/', blank=True, null=True)
     payment_method = models.CharField(max_length=20, choices=PAYMENT_METHOD_CHOICES, default='bank_transfer')
