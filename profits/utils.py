@@ -1,13 +1,9 @@
 from django.utils import timezone
 from decimal import Decimal
 from transactions.models import Transaction
-from shares.models import ShareRecord
 
 def create_reinvestment(payout):
-    """
-    Handles reinvestment logic based on payout type.
-    Returns True if reinvestment was created, False otherwise.
-    """
+
     if payout.reinvestment_created:
         return False  # Already reinvested
 
@@ -26,7 +22,7 @@ def create_reinvestment(payout):
         member_id=payout.transaction.member_id,
         amount=reinvest_amount,
         source_type='share',
-        direction='in',
+        direction='reinvest',
         payment_method='bank',
         created_at=timezone.now(),
     )

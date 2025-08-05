@@ -15,6 +15,7 @@ class Transaction(models.Model):
     DIRECTION_CHOICES = [
         ('in', 'In'),
         ('out', 'Out'),
+        ('reinvest', 'Reinvest'),
     ]
 
     PAYMENT_METHOD_CHOICES = [

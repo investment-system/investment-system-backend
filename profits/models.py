@@ -5,6 +5,9 @@ from transactions.models import Transaction
 from shares.models import ShareRecord
 from profits.utils import create_reinvestment
 from members.models import Member
+from django.core.mail import send_mail
+from django.conf import settings
+
 
 class ProfitPayout(models.Model):
     PAYOUT_TYPE_CHOICES = [
@@ -52,7 +55,7 @@ class ProfitPayout(models.Model):
 
         super().save(*args, **kwargs)
 
-        # ✅ Create profit payout transaction (to member) if needed
+
         if self.payout_type in ['partial', 'full_transfer']:
             if not Transaction.objects.filter(reference_id=f"PROFIT-{self.pk}").exists():
                 member = self.transaction.member
@@ -67,9 +70,30 @@ class ProfitPayout(models.Model):
                         created_at=timezone.now(),
                     )
 
+                    # ✅ Send email to the member
+                    if member.email:
+                        subject = 'Your Profit Payout Has Been Processed'
+                        message = (
+                            f"Dear {member.full_name},\n\n"
+                            f"We are pleased to inform you that your profit payout has been successfully processed "
+                            f"as a {self.get_payout_type_display()}.\n\n"
+                            f"Payout Amount: RM {self.refund_amount:.2f}\n\n"
+                            f"If you have any questions or require further assistance, please do not hesitate to contact us.\n\n"
+                            f"Thank you for your continued trust and support.\n\n"
+                            f"Warm regards,\n"
+                            f"Koperasi Team"
+                        )
+                        send_mail(
+                            subject,
+                            message,
+                            settings.DEFAULT_FROM_EMAIL,
+                            [member.email],
+                            fail_silently=False,
+                        )
+
+
         # ✅ Handle reinvestment
         create_reinvestment(self)
-
 
     def __str__(self):
         return f"Payout {self.payout_id} - {self.payout_type} - RM{self.refund_amount}"
