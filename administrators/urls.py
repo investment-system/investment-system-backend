@@ -7,8 +7,8 @@ from .views import (
 )
 
 urlpatterns = [
-    path('register/', AdminRegisterView.as_view(), name='admin-register'),
-    path('login/', AdminLoginView.as_view(), name='admin-login'),
-    path('profile/', AdminProfileView.as_view(), name='admin-profile'),
-    path('change-password/', AdminPasswordChangeView.as_view(), name='admin-change-password'),
+    path('administrator/register/', AdminRegisterView.as_view(), name='admin-register'),
+    path('administrator/login/', AdminLoginView.as_view(), name='admin-login'),
+    path('administrator/profile/', AdminProfileView.as_view(), name='admin-profile'),
+    path('administrator/change-password/', AdminPasswordChangeView.as_view(), name='admin-change-password'),
 ]

@@ -1,7 +1,12 @@
 import random
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 from django.db import models, IntegrityError, transaction
+from datetime import date, timedelta
 from django.utils import timezone
+
+def default_share_date():
+    return date.today()
+
 
 class MemberManager(BaseUserManager):
 
@@ -26,32 +31,37 @@ class Member(AbstractBaseUser, PermissionsMixin):
         ("female", "Female"),
     )
 
-    MEMBER_CODE_PREFIX = "MBR"
+    MEMBER_CODE_PREFIX = "MKM"
 
     member_code = models.CharField(max_length=30, unique=True, blank=True)
     email = models.EmailField(unique=True)
 
-    full_name = models.CharField(max_length=255, blank=True, null=True)
-    gender = models.CharField(max_length=10, choices=GENDER_CHOICES)
-    ic_number = models.CharField(max_length=255, blank=True, null=True)
-    date_of_birth = models.DateField(blank=True, null=True)
-    phone_number = models.CharField(max_length=20, blank=True, null=True)
-    country = models.CharField(max_length=100, blank=True, null=True)
-    address_line = models.CharField(max_length=255, blank=True, null=True)
-    city = models.CharField(max_length=100, blank=True, null=True)
-    state = models.CharField(max_length=100, blank=True, null=True)
+    full_name = models.CharField(max_length=255, blank=True, null=True, default="")
+    gender = models.CharField(max_length=10, choices=GENDER_CHOICES, default="male")
+    ic_number = models.CharField(max_length=255, blank=True, null=True, default="")
+    date_of_birth = models.DateField(blank=True, null=True, default=None)
+    phone_number = models.CharField(max_length=20, blank=True, null=True, default="")
+    country = models.CharField(max_length=100, blank=True, null=True, default="Malaysia")
+    address_line = models.CharField(max_length=255, blank=True, null=True, default="")
+    city = models.CharField(max_length=100, blank=True, null=True, default="")
+    state = models.CharField(max_length=100, blank=True, null=True, default="")
 
-    bank_name = models.CharField(max_length=100, blank=True, null=True)
-    account_holder_name = models.CharField(max_length=255, blank=True, null=True)
-    bank_account_number = models.CharField(max_length=100, blank=True, null=True)
+    bank_name = models.CharField(max_length=100, blank=True, null=True, default="")
+    account_holder_name = models.CharField(max_length=255, blank=True, null=True, default="")
+    bank_account_number = models.CharField(max_length=100, blank=True, null=True, default="")
 
     profile_picture = models.ImageField(upload_to='profile_pictures/', blank=True, null=True)
 
     is_active = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
 
-    date_joined = models.DateTimeField(default=timezone.now)
+    verification_code = models.CharField(max_length=6, blank=True, null=True)
+    code_created_at = models.DateTimeField(blank=True, null=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    date_joined = models.DateTimeField(auto_now_add=True)
+
 
     objects = MemberManager()
 
@@ -70,8 +80,6 @@ class Member(AbstractBaseUser, PermissionsMixin):
         self.verification_code = f"{random.randint(100000, 999999)}"
         self.code_created_at = timezone.now()
         self.save()
-
-
 
     def save(self, *args, **kwargs):
         if not self.member_code:

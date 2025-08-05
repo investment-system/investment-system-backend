@@ -8,15 +8,20 @@ from .views import (
     ChangePasswordView,
     VerifyCodeView,
     ResendCodeView,
+    RequestPasswordResetView,
+    ResetPasswordView,
 )
 urlpatterns = [
 
-    path('member/signup/', SignupView.as_view(), name='member-signup'),
-    path('member/login/', MemberLoginView.as_view(), name='member-login'),
-    path('member/profile/', ProfileView.as_view(), name='member-profile'),
-    path('member/change-password/', ChangePasswordView.as_view(), name='change-password'),
-    path('member/verify-code/', VerifyCodeView.as_view(), name='verify-code'),
-    path('member/resend-code/', ResendCodeView.as_view(), name='resend-code'),
+    path('signup/', SignupView.as_view(), name='member-signup'),
+    path('login/', MemberLoginView.as_view(), name='member-login'),
+    path('profile/', ProfileView.as_view(), name='member-profile'),
+    path('change-password/', ChangePasswordView.as_view(), name='change-password'),
+    path('verify-code/', VerifyCodeView.as_view(), name='verify-code'),
+    path('resend-code/', ResendCodeView.as_view(), name='resend-code'),
+    path('request-reset-password/', RequestPasswordResetView.as_view(), name='request-reset-password'),
+    path('reset-password/', ResetPasswordView.as_view(), name='reset-password'),
+
 
     path('members/', MemberListView.as_view(), name='member-list'),
     path('members/<int:pk>/', MemberDetailView.as_view(), name='member-detail'),

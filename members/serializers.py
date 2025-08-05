@@ -25,6 +25,7 @@ class MemberProfileSerializer(serializers.ModelSerializer):
             'ic_number', 'gender', 'date_of_birth',
             'country', 'address_line', 'city', 'state',
             'bank_name', 'account_holder_name', 'bank_account_number',
+            'is_active',
             'profile_picture',
         ]
 

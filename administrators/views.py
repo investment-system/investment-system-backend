@@ -7,14 +7,12 @@ from .serializers import (
     AdminProfileSerializer, AdminPasswordChangeSerializer
 )
 
-
 def get_tokens_for_user(user):
     refresh = RefreshToken.for_user(user)
     return {
         'refresh': str(refresh),
         'access': str(refresh.access_token),
     }
-
 
 class AdminRegisterView(generics.CreateAPIView):
     serializer_class = AdminRegisterSerializer
