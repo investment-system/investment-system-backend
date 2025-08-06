@@ -8,11 +8,9 @@ class ProfitPayoutAdmin(admin.ModelAdmin):
         'member',
         'payout_type',
         'get_original_amount',
-        'payout_type',
         'profit_rate',
         'profit_amount',
         'refund_amount',
-        'created_at',
     ]
 
     readonly_fields = [

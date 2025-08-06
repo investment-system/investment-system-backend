@@ -8,10 +8,11 @@ class MemberAdmin(UserAdmin):
 
     list_display = (
         'email', 'member_code', 'full_name', 'gender',
-        'phone_number', 'country', 'is_staff', 'is_active',
+        'phone_number', 'country',
+        'is_staff', 'is_active','registration_status',
         'created_at', 'updated_at',
     )
-    list_filter = ('is_staff', 'is_active', 'gender', 'country', 'state')
+    list_filter = ('is_staff', 'is_active', 'gender', 'country', 'state', 'registration_status',)
     ordering = ('-created_at',)
     search_fields = ('email', 'full_name', 'member_code', 'phone_number', 'ic_number')
 
@@ -24,7 +25,7 @@ class MemberAdmin(UserAdmin):
         ('Personal Info', {
             'fields': (
                 'member_code', 'full_name', 'gender', 'ic_number', 'date_of_birth',
-                'phone_number', 'profile_picture',
+                'phone_number', 'profile_picture', 'registration_status',
             )
         }),
         ('Address Info', {

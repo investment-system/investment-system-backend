@@ -31,6 +31,7 @@ class ProfitPayout(models.Model):
     refund_amount = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
 
     reinvestment_created = models.BooleanField(default=False)
+    updated_at = models.DateTimeField(auto_now=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     @property

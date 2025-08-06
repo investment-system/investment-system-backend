@@ -60,7 +60,6 @@ class CancellationRecord(models.Model):
         else:
             super().save(*args, **kwargs)
 
-        # Step 3: Create or update transaction
         transaction_data = {
             'member': self.member,
             'amount': self.refund_amount,

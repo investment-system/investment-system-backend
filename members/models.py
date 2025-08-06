@@ -31,6 +31,11 @@ class Member(AbstractBaseUser, PermissionsMixin):
         ("female", "Female"),
     )
 
+    REGISTRATION_STATUS_CHOICES = [
+        ('paid', 'Paid'),
+        ('unpaid', 'Unpaid'),
+    ]
+
     MEMBER_CODE_PREFIX = "MKM"
 
     member_code = models.CharField(max_length=30, unique=True, blank=True)
@@ -51,6 +56,8 @@ class Member(AbstractBaseUser, PermissionsMixin):
     bank_account_number = models.CharField(max_length=100, blank=True, null=True, default="")
 
     profile_picture = models.ImageField(upload_to='profile_pictures/', blank=True, null=True)
+
+    registration_status = models.CharField( max_length=10, choices=REGISTRATION_STATUS_CHOICES, default='unpaid')
 
     is_active = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
