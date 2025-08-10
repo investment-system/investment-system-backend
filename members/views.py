@@ -11,7 +11,6 @@ from .models import Member
 
 User = get_user_model()
 
-
 class MemberListView(generics.ListAPIView):
     queryset = Member.objects.select_related('user').all().order_by('-created_at')
     serializer_class = MemberListSerializer
@@ -19,7 +18,6 @@ class MemberListView(generics.ListAPIView):
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['user__email', 'user__full_name', 'member_code']
     ordering_fields = ['created_at', 'member_code']
-
 
 class MemberRegisterView(APIView):
     permission_classes = [AllowAny]

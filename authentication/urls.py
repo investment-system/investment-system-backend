@@ -6,7 +6,9 @@ from .views import (
     AdminLoginView,
     LogoutView,
     ChangePasswordView,
-    UserProfileView
+    UserProfileView,
+    AdminListView,
+    MemberListView
 )
 
 urlpatterns = [
@@ -23,4 +25,8 @@ urlpatterns = [
     path('logout/', LogoutView.as_view(), name='logout'),
     path('change-password/', ChangePasswordView.as_view(), name='change-password'),
     path('profile/', UserProfileView.as_view(), name='profile'),
+    path('administrators/', AdminListView.as_view(), name='admin-list'),
+    path('members/', MemberListView.as_view(), name='member-list'),
+
+
 ]
