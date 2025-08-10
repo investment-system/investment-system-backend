@@ -23,10 +23,10 @@ def create_share_record_if_needed(sender, instance, created, **kwargs):
 
         # ✅ Send email notification to the member
         member = instance.member
-        if member and member.email:
+        if member and hasattr(member, 'user') and member.user.email:  # Updated this line
             subject = 'Your Share Purchase Has Been Confirmed'
             message = (
-                f"Dear {member.full_name},\n\n"
+                f"Dear {member.user.full_name},\n\n"  # Updated to use member.user
                 f"We are pleased to confirm the successful purchase of your share under the '{share_record.project_name}' project.\n\n"
                 f"Below are the details of your share investment:\n"
                 f"- Investment Amount: RM {instance.amount:.2f}\n"
@@ -43,6 +43,6 @@ def create_share_record_if_needed(sender, instance, created, **kwargs):
                 subject,
                 message,
                 settings.DEFAULT_FROM_EMAIL,
-                [member.email],
+                [member.user.email],  # Updated to use member.user.email
                 fail_silently=False,
             )

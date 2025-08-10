@@ -12,9 +12,9 @@ urlpatterns = [
     path('api/', include('shares.urls')),
     path('api/', include('profits.urls')),
 
-
+    path('api/auth/', include('authentication.urls')),
     path('api/', include('members.urls')),
-    path('api/', include('administrators.urls')),
+    path('api/', include('administrator.urls')),
 
 ]
 

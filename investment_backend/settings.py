@@ -25,6 +25,7 @@ INSTALLED_APPS = [
     # Third party apps
     'rest_framework',
     'rest_framework_simplejwt',
+    'rest_framework.authtoken',  # ✅ Add this
     'corsheaders',
 
     # Local apps
@@ -33,11 +34,13 @@ INSTALLED_APPS = [
     'profits',
     'cancels',
     'registrations',
-    'administrators',
+
+    'authentication',
+    'administrator',
     'members',
 ]
 
-AUTH_USER_MODEL = 'administrators.Administrator'
+AUTH_USER_MODEL = 'authentication.User'
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -99,14 +102,14 @@ AUTH_PASSWORD_VALIDATORS = [
 # REST Framework Configuration
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.TokenAuthentication',  # Add this!
     ),
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny',
     ],
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',
-        'rest_framework.renderers.BrowsableAPIRenderer',  # ← add this
+        'rest_framework.renderers.BrowsableAPIRenderer',
     ),
 }
 

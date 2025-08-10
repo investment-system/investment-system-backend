@@ -1,42 +1,41 @@
 from rest_framework import serializers
-from django.contrib.auth.password_validation import validate_password
 from .models import Member
-
-
-class MemberSignupSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True, validators=[validate_password])
-    member_code = serializers.CharField(read_only=True)
-
-    class Meta:
-        model = Member
-        fields = ['email', 'full_name', 'password', 'member_code']
-
-    def create(self, validated_data):
-        return Member.objects.create_user(**validated_data)
-
+from authentication.serializers import UserSerializer
 
 class MemberProfileSerializer(serializers.ModelSerializer):
-    member_code = serializers.CharField(read_only=True)
+    user = UserSerializer(read_only=True)
 
     class Meta:
         model = Member
         fields = [
-            'email', 'full_name', 'phone_number', 'member_code',
-            'ic_number', 'gender', 'date_of_birth',
-            'country', 'address_line', 'city', 'state',
+            'user', 'member_code', 'gender', 'ic_number', 'date_of_birth',
+            'phone_number', 'country', 'address_line', 'city', 'state',
             'bank_name', 'account_holder_name', 'bank_account_number',
-            'is_active',
-            'profile_picture',
+            'profile_picture', 'registration_status'
         ]
+        read_only_fields = ['member_code']
 
+class MemberRegisterSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    full_name = serializers.CharField()
+    password = serializers.CharField(write_only=True)
+    gender = serializers.ChoiceField(choices=Member.GENDER_CHOICES)
 
+    def create(self, validated_data):
+        user_data = {
+            'email': validated_data['email'],
+            'full_name': validated_data['full_name'],
+            'password': validated_data['password'],
+            'user_type': 'member'
+        }
 
-class ChangePasswordSerializer(serializers.Serializer):
-    old_password = serializers.CharField(required=True)
-    new_password = serializers.CharField(required=True, validators=[validate_password])
-    confirm_password = serializers.CharField(required=True)
+        member_data = {
+            'gender': validated_data['gender']
+        }
 
-    def validate(self, data):
-        if data['new_password'] != data['confirm_password']:
-            raise serializers.ValidationError("New password and confirm password do not match.")
-        return data
+        # This would be handled in the view
+        return {'user_data': user_data, 'member_data': member_data}
+
+class VerificationSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    code = serializers.CharField(max_length=6)

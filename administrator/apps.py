@@ -1,8 +1,8 @@
 from django.apps import AppConfig
 
-class MembersConfig(AppConfig):
+class AdministratorConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'members'
+    name = 'administrator'
 
     def ready(self):
-        import members.signals
+        import administrator.signals

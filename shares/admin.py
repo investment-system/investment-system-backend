@@ -19,4 +19,5 @@ class ShareRecordAdmin(admin.ModelAdmin):
 
     def profit_amount(self, obj):
         return obj.calculate_profit()
+
     profit_amount.short_description = 'Profit Amount'
