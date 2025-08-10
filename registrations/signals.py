@@ -19,7 +19,6 @@ def create_registration_payment(sender, instance, created, **kwargs):
 
             message = (
 
-                f"Subject: Registration Payment Confirmation\n\n"
                 f"Dear {payment.member.full_name},\n\n"
                 f"We are pleased to inform you that we have successfully received your registration payment for the Koperasi Masjid investment platform.\n\n"
                 f"Below are the details of your payment:\n"
