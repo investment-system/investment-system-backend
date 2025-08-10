@@ -2,6 +2,14 @@ from rest_framework import serializers
 from .models import Member
 from authentication.serializers import UserSerializer
 
+class MemberListSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField(source='user.email')
+    full_name = serializers.CharField(source='user.full_name')
+
+    class Meta:
+        model = Member
+        fields = ['member_code', 'full_name', 'email', 'gender', 'registration_status', 'created_at']
+
 class MemberProfileSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
 

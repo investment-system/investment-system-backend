@@ -1,15 +1,25 @@
-from rest_framework import generics, status
+from rest_framework import generics, permissions, filters
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.views import APIView
 from django.utils import timezone
 from django.contrib.auth import get_user_model
 from authentication.models import User
-from .models import Member
 from .serializers import *
 from authentication.utils import send_verification_email
+from .models import Member
 
 User = get_user_model()
+
+
+class MemberListView(generics.ListAPIView):
+    queryset = Member.objects.select_related('user').all().order_by('-created_at')
+    serializer_class = MemberListSerializer
+    permission_classes = [permissions.IsAdminUser]
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ['user__email', 'user__full_name', 'member_code']
+    ordering_fields = ['created_at', 'member_code']
+
 
 class MemberRegisterView(APIView):
     permission_classes = [AllowAny]

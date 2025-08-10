@@ -10,6 +10,7 @@ from .views import (
 )
 
 urlpatterns = [
+
     # Member endpoints
     path('member/register/', MemberRegisterView.as_view(), name='member-register'),
     path('member/login/', MemberLoginView.as_view(), name='member-login'),

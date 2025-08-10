@@ -11,7 +11,7 @@ SECRET_KEY = 'your-secret-key-here'
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1',]
 
 # Application definition
 INSTALLED_APPS = [
@@ -53,7 +53,13 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-CORS_ALLOW_ALL_ORIGINS = True
+# Allow only your frontend origin
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+]
+
+# Allow cookies / credentials
+CORS_ALLOW_CREDENTIALS = True
 
 ROOT_URLCONF = 'investment_backend.urls'
 
