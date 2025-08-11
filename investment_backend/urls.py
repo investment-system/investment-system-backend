@@ -7,7 +7,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     # Modular app routes
-    path('api/', include('transactions.urls')),
+    path('api/transactions/', include('transactions.urls')),
     path('api/', include('registrations.urls')),
     path('api/', include('shares.urls')),
     path('api/', include('profits.urls')),
