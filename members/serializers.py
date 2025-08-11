@@ -47,3 +47,8 @@ class MemberRegisterSerializer(serializers.Serializer):
 class VerificationSerializer(serializers.Serializer):
     email = serializers.EmailField()
     code = serializers.CharField(max_length=6)
+
+class MemberStatsSerializer(serializers.Serializer):
+    total_members = serializers.IntegerField()
+    total_active_members = serializers.IntegerField()
+    total_inactive_members = serializers.IntegerField()
