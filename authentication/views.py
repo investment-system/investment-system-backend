@@ -1,60 +1,54 @@
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.authtoken.models import Token
+from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from django.contrib.auth import authenticate
 from .serializers import (
     UserSerializer,
     MemberRegisterSerializer,
-    MemberLoginSerializer,
     AdminRegisterSerializer,
-    AdminLoginSerializer,
     ChangePasswordSerializer
 )
 from .models import User
 
-# Member views
+class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+    username_field = User.USERNAME_FIELD  # tells parent to use 'email' instead of 'username'
+
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+        token['email'] = user.email
+        token['user_type'] = user.user_type
+        return token
+
+    def validate(self, attrs):
+        user = authenticate(email=attrs.get('email'), password=attrs.get('password'))
+        if not user:
+            raise serializers.ValidationError("Invalid credentials")
+        if not user.is_active:
+            raise serializers.ValidationError("Account disabled")
+
+        # Now parent validate expects 'email', not 'username'
+        data = super().validate(attrs)
+        data['user'] = {
+            'id': user.id,
+            'email': user.email,
+            'full_name': user.full_name,
+            'user_type': user.user_type,
+        }
+        return data
+
+class MyTokenObtainPairView(TokenObtainPairView):
+    serializer_class = MyTokenObtainPairSerializer
+
 class MemberRegisterView(generics.CreateAPIView):
     serializer_class = MemberRegisterSerializer
     permission_classes = [permissions.AllowAny]
 
-class MemberLoginView(APIView):
-    permission_classes = [permissions.AllowAny]
-
-    def post(self, request):
-        serializer = MemberLoginSerializer(data=request.data, context={'request': request})
-        serializer.is_valid(raise_exception=True)
-        user = serializer.validated_data['user']
-        token, _ = Token.objects.get_or_create(user=user)
-        return Response({
-            'token': token.key,
-            'user': UserSerializer(user).data
-        })
-
-# Admin views
 class AdminRegisterView(generics.CreateAPIView):
     serializer_class = AdminRegisterSerializer
-    permission_classes = [permissions.IsAdminUser]  # Only existing admins can register new admins
-
-class AdminLoginView(APIView):
-    permission_classes = [permissions.AllowAny]
-
-    def post(self, request):
-        serializer = AdminLoginSerializer(data=request.data, context={'request': request})
-        serializer.is_valid(raise_exception=True)
-        user = serializer.validated_data['user']
-        token, _ = Token.objects.get_or_create(user=user)
-        return Response({
-            'token': token.key,
-            'user': UserSerializer(user).data
-        })
-
-# Shared views
-class LogoutView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
-
-    def post(self, request):
-        request.user.auth_token.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+    permission_classes = [permissions.IsAdminUser]
 
 class ChangePasswordView(generics.UpdateAPIView):
     serializer_class = ChangePasswordSerializer
@@ -80,11 +74,11 @@ class AdminListView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        return User.objects.filter(administrator__isnull=False)  # users linked to Administrator
+        return User.objects.filter(user_type='admin')
 
 class MemberListView(generics.ListAPIView):
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        return User.objects.filter(member__isnull=False)  # users linked to Member
+        return User.objects.filter(user_type='member')

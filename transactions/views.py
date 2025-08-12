@@ -26,7 +26,7 @@ class TransactionStatsAPIView(APIView):
         registration_amount = Transaction.objects.filter(source_type='registration_payments', direction='in').aggregate(total=Sum('amount'))['total'] or 0
 
         share_amount = Transaction.objects.filter(source_type='share', direction='in').aggregate(total=Sum('amount'))['total'] or 0
-        share_completed = Transaction.objects.filter(source_type='share').count()
+        share_completed = Transaction.objects.filter(source_type='share', direction='out').count()
         share_canceled = Transaction.objects.filter(source_type='cancellation').aggregate(total=Sum('amount'))['total'] or 0
         total_transactions = Transaction.objects.count()
         money_in = Transaction.objects.filter(direction='in').aggregate(total=Sum('amount'))['total'] or 0
