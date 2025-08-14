@@ -26,7 +26,8 @@ class ShareRecord(models.Model):
     expected_share_maturity_date = models.DateField(default=default_maturity_date)
 
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='active')
-    received_transaction = models.ForeignKey(Transaction, on_delete=models.CASCADE, related_name='share_record')
+    received_transaction = models.OneToOneField(Transaction,on_delete=models.CASCADE, related_name='share_record')
+
     share_duration_days = models.IntegerField(default=365)
     profit_payout_created = models.BooleanField(default=False)
 

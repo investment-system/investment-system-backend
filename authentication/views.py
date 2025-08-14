@@ -1,6 +1,5 @@
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
-from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.contrib.auth import authenticate
@@ -8,9 +7,9 @@ from .serializers import (
     UserSerializer,
     MemberRegisterSerializer,
     AdminRegisterSerializer,
-    ChangePasswordSerializer
+    ChangePasswordSerializer,
 )
-from .models import User
+from members.models import User
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     username_field = User.USERNAME_FIELD  # tells parent to use 'email' instead of 'username'
@@ -82,3 +81,4 @@ class MemberListView(generics.ListAPIView):
 
     def get_queryset(self):
         return User.objects.filter(user_type='member')
+

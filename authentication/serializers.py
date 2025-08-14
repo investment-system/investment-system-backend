@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth.password_validation import validate_password
 from .models import User
+from members.models import Member
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -48,3 +49,23 @@ class ChangePasswordSerializer(serializers.Serializer):
         if not user.check_password(value):
             raise serializers.ValidationError("Old password is incorrect")
         return value
+
+class MemberProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Member
+        fields = [
+            'ic_number', 'gender', 'date_of_birth', 'phone_number',
+            'country', 'city', 'state', 'bank_name',
+            'account_holder_name', 'bank_account_number'
+        ]
+
+class UserWithMemberSerializer(serializers.ModelSerializer):
+    member_profile = MemberProfileSerializer(read_only=True)
+
+    class Meta:
+        model = User
+        fields = [
+            'id', 'email', 'full_name', 'user_type', 'is_active',
+            'member_profile'
+        ]
+        read_only_fields = ['id', 'is_active']

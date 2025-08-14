@@ -1,5 +1,7 @@
 from rest_framework import serializers
-from .models import ShareRecord, Transaction
+from .models import Transaction
+from shares.models import ShareRecord
+
 
 class TransactionSerializer(serializers.ModelSerializer):
     class Meta:

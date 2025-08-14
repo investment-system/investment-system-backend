@@ -64,3 +64,15 @@ class UserTransactionsAPIView(APIView):
         transactions = Transaction.objects.filter(member=member)
         serializer = TransactionSerializer(transactions, many=True)
         return Response(serializer.data)
+
+class UserTransactionDetailAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, pk):
+        user = request.user
+        try:
+            transaction = Transaction.objects.get(pk=pk, member__user=user)
+        except Transaction.DoesNotExist:
+            return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
+        serializer = TransactionSerializer(transaction)
+        return Response(serializer.data)

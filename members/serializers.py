@@ -1,6 +1,5 @@
 from rest_framework import serializers
 from .models import Member
-from authentication.serializers import UserSerializer
 
 class MemberListSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(source='user.email')
@@ -11,12 +10,13 @@ class MemberListSerializer(serializers.ModelSerializer):
         fields = ['member_code', 'full_name', 'email', 'gender', 'registration_status', 'created_at']
 
 class MemberProfileSerializer(serializers.ModelSerializer):
-    user = UserSerializer(read_only=True)
+    email = serializers.EmailField(source="user.email", read_only=True)
+    full_name = serializers.CharField(source="user.full_name", read_only=True)
 
     class Meta:
         model = Member
         fields = [
-            'user', 'member_code', 'gender', 'ic_number', 'date_of_birth',
+            'email', 'full_name', 'member_code', 'gender', 'ic_number', 'date_of_birth',
             'phone_number', 'country', 'address_line', 'city', 'state',
             'bank_name', 'account_holder_name', 'bank_account_number',
             'profile_picture', 'registration_status'

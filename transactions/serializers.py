@@ -1,11 +1,13 @@
 from rest_framework import serializers
 from .models import Transaction
+from shares.serializers import ShareRecordSerializer
 
 class TransactionSerializer(serializers.ModelSerializer):
+    share_record = ShareRecordSerializer(read_only=True)  # Nested data
+
     class Meta:
         model = Transaction
         fields = '__all__'
-        read_only_fields = ['transaction_code']
 
 class TransactionStatsSerializer(serializers.Serializer):
     registration_amount = serializers.DecimalField(max_digits=15, decimal_places=2)
