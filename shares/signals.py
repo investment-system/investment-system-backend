@@ -28,7 +28,7 @@ def create_profit_payout(share):
             share_record=share,
             transaction=share.received_transaction,
             payout_type='pending',
-            profit_rate=share.share_return_rate
+            profit_rate=share.share_return_rate,
         )
         share.profit_payout_created = True
         share.save(update_fields=['profit_payout_created'])

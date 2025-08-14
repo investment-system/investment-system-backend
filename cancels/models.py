@@ -19,7 +19,7 @@ class CancellationRecord(models.Model):
     )
     cancellation_date = models.DateField(auto_now_add=True)
     payout_type = models.CharField(
-        max_length=20, choices=PAYOUT_TYPE_CHOICES, default='pending'
+        max_length=20, choices=PAYOUT_TYPE_CHOICES, default='full_transfer'
     )
     penalty_rate = models.DecimalField(max_digits=5, decimal_places=2, default=0.00)
     penalty_amount = models.DecimalField(max_digits=10, decimal_places=2, editable=True)

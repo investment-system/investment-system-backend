@@ -28,9 +28,10 @@ class TransactionStatsAPIView(APIView):
         registration_amount = Transaction.objects.filter(source_type='registration_payments', direction='in').aggregate(total=Sum('amount'))['total'] or 0
 
         share_amount = Transaction.objects.filter(source_type='share', direction='in').aggregate(total=Sum('amount'))['total'] or 0
-        share_completed = Transaction.objects.filter(source_type='share', direction='out').count()
+        share_completed = Transaction.objects.filter(direction='out').exclude(source_type='cancellation').count()
         share_canceled = Transaction.objects.filter(source_type='cancellation').aggregate(total=Sum('amount'))['total'] or 0
         total_transactions = Transaction.objects.count()
+        total_balance = Transaction.objects.filter(direction='in').aggregate(total=Sum('amount'))['total'] or 0
         money_in = Transaction.objects.filter(direction='in').aggregate(total=Sum('amount'))['total'] or 0
         money_out = Transaction.objects.filter(direction='out').aggregate(total=Sum('amount'))['total'] or 0
         money_reinvest = Transaction.objects.filter(direction='reinvest').aggregate(total=Sum('amount'))['total'] or 0
@@ -42,6 +43,7 @@ class TransactionStatsAPIView(APIView):
             'share_completed': share_completed,
             'share_canceled': share_canceled,
             'total_transactions': total_transactions,
+            'total_balance' : total_balance,
             'money_in': money_in,
             'money_out': money_out,
             'money_reinvest': money_reinvest,

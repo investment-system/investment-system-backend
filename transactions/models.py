@@ -10,6 +10,7 @@ class Transaction(models.Model):
         ('payment', 'Payment'),
         ('cancellation', 'Cancellation'),
         ('registration_payments', 'Registration Payment'),
+        ('Profit_payments', 'Profit Payment'),
     ]
 
     DIRECTION_CHOICES = [
