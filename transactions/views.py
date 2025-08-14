@@ -4,7 +4,6 @@ from rest_framework import status, viewsets
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.db.models import Sum
 from .serializers import TransactionSerializer, TransactionStatsSerializer
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -13,8 +12,7 @@ from .models import Transaction
 class TransactionViewSet(viewsets.ModelViewSet):
     queryset = Transaction.objects.all()
     serializer_class = TransactionSerializer
-    permission_classes = [AllowAny]  # Change to IsAuthenticated in production
-
+    permission_classes = [IsAuthenticated]
     @action(detail=False, methods=['post'], url_path='add')
     def add_transaction(self, request):
         serializer = self.get_serializer(data=request.data)

@@ -29,23 +29,7 @@ class AdminProfileSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['admin_code']
 
-class AdminRegisterSerializer(serializers.Serializer):
-    email = serializers.EmailField()
-    full_name = serializers.CharField()
-    password = serializers.CharField(write_only=True)
-    role = serializers.ChoiceField(choices=Administrator.ROLE_CHOICES, default='admin')
-
-    def create(self, validated_data):
-        user_data = {
-            'email': validated_data['email'],
-            'full_name': validated_data['full_name'],
-            'password': validated_data['password'],
-            'user_type': 'admin',
-            'is_staff': True  # All admins are staff by default
-        }
-
-        admin_data = {
-            'role': validated_data['role']
-        }
-
-        return {'user_data': user_data, 'admin_data': admin_data}
+class AdminStatsSerializer(serializers.Serializer):
+    total_admins = serializers.IntegerField()
+    active_admins = serializers.IntegerField()
+    inactive_admins = serializers.IntegerField()

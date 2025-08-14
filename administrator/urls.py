@@ -1,8 +1,11 @@
 from django.urls import path
-from .views import AdminRegisterView, AdminProfileView, AdminListView
+from .views import AdminProfileView, AdminListView, AdminStatsView
 
 urlpatterns = [
-    path('register/', AdminRegisterView.as_view(), name='admin-register'),
+
     path('admin/profile/', AdminProfileView.as_view(), name='admin-profile'),
     path('list/', AdminListView.as_view(), name='admin-list'),
+    path('stats/', AdminStatsView.as_view(), name='admin-stats'),
+
+
 ]
