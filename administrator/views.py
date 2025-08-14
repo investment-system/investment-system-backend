@@ -1,20 +1,20 @@
-from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
 from rest_framework.views import APIView
 from django.contrib.auth import get_user_model
 from .serializers import *
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework import generics
 from .models import Administrator
-from rest_framework import serializers
+from .serializers import AdminProfileSerializer
 
 
 User = get_user_model()
 
 class AdminListView(generics.ListAPIView):
-    serializer_class = AdminProfileSerializer
+    serializer_class = AdminProfileSerializer  # include full profile
     permission_classes = [IsAuthenticated]
-    queryset = Administrator.objects.all()
+    queryset = Administrator.objects.select_related('user').all()
 
 class AdminProfileView(APIView):
     permission_classes = [IsAuthenticated]
@@ -31,10 +31,17 @@ class AdminProfileView(APIView):
         serializer = AdministratorSerializer(admin_profile)
         return Response(serializer.data)
 
-class AdminStatsSerializer(serializers.Serializer):
-    total_admins = serializers.IntegerField()
-    active_admins = serializers.IntegerField()
-    inactive_admins = serializers.IntegerField()
+class AdminDeleteView(APIView):
+    permission_classes = [IsAdminUser]  # Only admins can delete
+
+    def delete(self, request, pk):
+        try:
+            admin = Administrator.objects.get(pk=pk)
+            admin.user.delete()  # optionally delete the related user too
+            admin.delete()
+            return Response({'detail': 'Admin deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
+        except Administrator.DoesNotExist:
+            return Response({'detail': 'Admin not found'}, status=status.HTTP_404_NOT_FOUND)
 
 class AdminStatsView(APIView):
     permission_classes = [IsAuthenticated]

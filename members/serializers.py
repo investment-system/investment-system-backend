@@ -23,27 +23,6 @@ class MemberProfileSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['member_code']
 
-class MemberRegisterSerializer(serializers.Serializer):
-    email = serializers.EmailField()
-    full_name = serializers.CharField()
-    password = serializers.CharField(write_only=True)
-    gender = serializers.ChoiceField(choices=Member.GENDER_CHOICES)
-
-    def create(self, validated_data):
-        user_data = {
-            'email': validated_data['email'],
-            'full_name': validated_data['full_name'],
-            'password': validated_data['password'],
-            'user_type': 'member'
-        }
-
-        member_data = {
-            'gender': validated_data['gender']
-        }
-
-        # This would be handled in the view
-        return {'user_data': user_data, 'member_data': member_data}
-
 class VerificationSerializer(serializers.Serializer):
     email = serializers.EmailField()
     code = serializers.CharField(max_length=6)
