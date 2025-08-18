@@ -5,6 +5,7 @@ from .views import (
     TransactionStatsAPIView,
     UserTransactionDetailAPIView,
     UserTransactionsAPIView,
+    AdminMemberTransactionListAPIView,
 )
 
 router = DefaultRouter()
@@ -15,4 +16,6 @@ urlpatterns = [
     path('user/', UserTransactionsAPIView.as_view(), name='user-transactions'),
     path('user/<int:pk>/', UserTransactionDetailAPIView.as_view(), name='user-transaction-detail'),
     path('stats/', TransactionStatsAPIView.as_view(), name='transaction-stats'),
+    path('admin/member/<int:member_id>/transactions/', AdminMemberTransactionListAPIView.as_view(), name='admin-member-transactions'),
+
 ]

@@ -3,11 +3,11 @@ from django.db.models import Sum
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
-from rest_framework.response import Response
-from rest_framework.views import APIView
-from .models import Transaction
 from .serializers import TransactionSerializer, TransactionStatsSerializer
-from authentication.models import User
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status, permissions
+from .models import Transaction
 
 
 class TransactionViewSet(viewsets.ModelViewSet):
@@ -93,3 +93,15 @@ class UserTransactionDetailAPIView(APIView):
         serializer = TransactionSerializer(transaction)
         return Response(serializer.data)
 
+class AdminMemberTransactionListAPIView(APIView):
+    permission_classes = [permissions.IsAdminUser]  # admin-only
+
+    def get(self, request, member_id):
+        transactions = Transaction.objects.filter(member_id=member_id).order_by('-created_at')
+        if not transactions.exists():
+            return Response(
+                {"detail": "No transactions found for this member."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        serializer = TransactionSerializer(transactions, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
