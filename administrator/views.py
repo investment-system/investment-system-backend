@@ -31,6 +31,22 @@ class AdminProfileView(APIView):
         serializer = AdministratorSerializer(admin_profile)
         return Response(serializer.data)
 
+    def patch(self, request):
+        """Partial update of admin profile"""
+        user = request.user
+        if user.user_type != 'admin':
+            return Response({'detail': 'Not an admin user'}, status=status.HTTP_403_FORBIDDEN)
+        try:
+            admin_profile = Administrator.objects.get(user=user)
+        except Administrator.DoesNotExist:
+            return Response({'detail': 'Admin profile not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = AdministratorSerializer(admin_profile, data=request.data, partial=True)  # ✅ partial=True
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 class AdminDeleteView(APIView):
     permission_classes = [IsAdminUser]  # Only admins can delete
 
@@ -59,3 +75,8 @@ class AdminStatsView(APIView):
 
         serializer = AdminStatsSerializer(data)
         return Response(serializer.data)
+
+class AdminDetailView(generics.RetrieveAPIView):
+    queryset = Administrator.objects.select_related('user')
+    serializer_class = AdminDetailSerializer
+    permission_classes = [IsAuthenticated]

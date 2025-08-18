@@ -23,6 +23,11 @@ class MemberProfileView(generics.RetrieveUpdateAPIView):
     def get_object(self):
         return Member.objects.get(user=self.request.user)
 
+class AdminMemberDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Member.objects.all()
+    serializer_class = MemberProfileSerializer
+    permission_classes = [permissions.IsAdminUser]
+
 class MemberStatsAPIView(APIView):
     def get(self, request):
         total_members = Member.objects.count()
@@ -39,3 +44,4 @@ class MemberStatsAPIView(APIView):
         serializer.is_valid()
 
         return Response(serializer.data)
+

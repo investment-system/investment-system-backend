@@ -1,9 +1,15 @@
+from shares.serializers import ShareRecordSerializer
 from rest_framework import serializers
 from .models import Transaction
-from shares.serializers import ShareRecordSerializer
+from members.models import Member
+
+class MemberSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Member
+        fields = ['id', 'name', 'email', 'phone']  # only the fields you need
 
 class TransactionSerializer(serializers.ModelSerializer):
-    share_record = ShareRecordSerializer(read_only=True)  # Nested data
+    share_record = ShareRecordSerializer(read_only=True)
 
     class Meta:
         model = Transaction
