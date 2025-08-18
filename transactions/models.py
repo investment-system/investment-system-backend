@@ -28,7 +28,7 @@ class Transaction(models.Model):
 
     transaction_id = models.AutoField(primary_key=True)
     transaction_code = models.CharField(max_length=30, unique=True, blank=True, editable=False)
-    member = models.ForeignKey(Member, on_delete=models.SET_NULL, null=True, blank=True, related_name='transactions')
+    member = models.ForeignKey(Member, on_delete=models.CASCADE, null=False, blank=False)
     source_type = models.CharField(max_length=50, choices=SOURCE_TYPE_CHOICES)
     reference_id = models.CharField(max_length=50, blank=True, null=True)
     direction = models.CharField(max_length=15, choices=DIRECTION_CHOICES, default='in')

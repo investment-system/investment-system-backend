@@ -2,10 +2,9 @@ from decimal import Decimal
 from django.db.models import Sum
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
 from .models import Transaction
 from .serializers import TransactionSerializer, TransactionStatsSerializer
 
@@ -22,7 +21,6 @@ class TransactionViewSet(viewsets.ModelViewSet):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 class TransactionStatsAPIView(APIView):
     permission_classes = [IsAuthenticated]
@@ -69,7 +67,6 @@ class TransactionStatsAPIView(APIView):
         serializer.is_valid(raise_exception=True)
         return Response(serializer.data)
 
-
 class UserTransactionsAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -82,7 +79,6 @@ class UserTransactionsAPIView(APIView):
         transactions = Transaction.objects.filter(member=member)
         serializer = TransactionSerializer(transactions, many=True)
         return Response(serializer.data)
-
 
 class UserTransactionDetailAPIView(APIView):
     permission_classes = [IsAuthenticated]

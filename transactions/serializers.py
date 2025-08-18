@@ -9,7 +9,7 @@ class MemberSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'email', 'phone']  # only the fields you need
 
 class TransactionSerializer(serializers.ModelSerializer):
-    share_record = ShareRecordSerializer(read_only=True)
+    share_record = ShareRecordSerializer(read_only=True, allow_null=True)  # allow null
 
     class Meta:
         model = Transaction
