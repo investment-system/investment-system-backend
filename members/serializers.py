@@ -4,10 +4,11 @@ from .models import Member
 class MemberListSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(source='user.email')
     full_name = serializers.CharField(source='user.full_name')
+    id = serializers.CharField(source='user.id')
 
     class Meta:
         model = Member
-        fields = ['member_code', 'full_name', 'email', 'gender', 'registration_status', 'created_at']
+        fields = '__all__'
 
 class MemberProfileSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(source="user.email", read_only=True)
