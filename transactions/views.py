@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from .models import Transaction
 from .serializers import TransactionSerializer, TransactionStatsSerializer
+from authentication.models import User
 
 
 class TransactionViewSet(viewsets.ModelViewSet):
@@ -90,4 +91,25 @@ class UserTransactionDetailAPIView(APIView):
         except Transaction.DoesNotExist:
             return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
         serializer = TransactionSerializer(transaction)
+        return Response(serializer.data)
+
+class AdminUserTransactionAPIView(APIView):
+    permission_classes = [IsAdminUser]  # Only admin can access
+
+    def get(self, request, pk):
+        transactions = Transaction.objects.filter(member__user__id=pk)
+        serializer = TransactionSerializer(transactions, many=True)
+        return Response(serializer.data)
+
+class AdminMemberTransactionsAPIView(APIView):
+    permission_classes = [IsAdminUser]
+
+    def get(self, request, user_id):
+        try:
+            user = User.objects.get(pk=user_id, user_type='member')
+        except User.DoesNotExist:
+            return Response({"detail": "Member not found."}, status=404)
+
+        transactions = Transaction.objects.filter(member=user).order_by('-created_at')
+        serializer = TransactionSerializer(transactions, many=True)
         return Response(serializer.data)
