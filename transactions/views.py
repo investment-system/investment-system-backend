@@ -93,23 +93,3 @@ class UserTransactionDetailAPIView(APIView):
         serializer = TransactionSerializer(transaction)
         return Response(serializer.data)
 
-class AdminUserTransactionAPIView(APIView):
-    permission_classes = [IsAdminUser]  # Only admin can access
-
-    def get(self, request, pk):
-        transactions = Transaction.objects.filter(member__user__id=pk)
-        serializer = TransactionSerializer(transactions, many=True)
-        return Response(serializer.data)
-
-class AdminMemberTransactionsAPIView(APIView):
-    permission_classes = [IsAdminUser]
-
-    def get(self, request, user_id):
-        try:
-            user = User.objects.get(pk=user_id, user_type='member')
-        except User.DoesNotExist:
-            return Response({"detail": "Member not found."}, status=404)
-
-        transactions = Transaction.objects.filter(member=user).order_by('-created_at')
-        serializer = TransactionSerializer(transactions, many=True)
-        return Response(serializer.data)
