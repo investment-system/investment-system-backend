@@ -1,7 +1,6 @@
 from django.utils import timezone
 from django.db import models
-from django.conf import settings
-
+from members.models import Member
 
 class Transaction(models.Model):
     SOURCE_TYPE_CHOICES = [
@@ -27,10 +26,9 @@ class Transaction(models.Model):
         ('ewallet', 'E-Wallet'),
     ]
 
-    member = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)  # must point to your custom User
-
     transaction_id = models.AutoField(primary_key=True)
     transaction_code = models.CharField(max_length=30, unique=True, blank=True, editable=False)
+    member = models.ForeignKey(Member, on_delete=models.CASCADE, null=False, blank=False)
     source_type = models.CharField(max_length=50, choices=SOURCE_TYPE_CHOICES)
     reference_id = models.CharField(max_length=50, blank=True, null=True)
     direction = models.CharField(max_length=15, choices=DIRECTION_CHOICES, default='in')
