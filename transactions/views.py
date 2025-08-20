@@ -1,6 +1,6 @@
 from decimal import Decimal
 from django.db.models import Sum
-from rest_framework import status, viewsets
+from rest_framework import status, viewsets, generics
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from .serializers import TransactionSerializer, TransactionStatsSerializer
@@ -15,6 +15,7 @@ class TransactionViewSet(viewsets.ModelViewSet):
     serializer_class = TransactionSerializer
     permission_classes = [IsAuthenticated]
 
+
     @action(detail=False, methods=['post'], url_path='add')
     def add_transaction(self, request):
         serializer = self.get_serializer(data=request.data)
@@ -22,6 +23,10 @@ class TransactionViewSet(viewsets.ModelViewSet):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class TransactionCreateView(generics.CreateAPIView):
+    queryset = Transaction.objects.all()
+    serializer_class = TransactionSerializer
 
 class TransactionStatsAPIView(APIView):
     permission_classes = [IsAuthenticated]
@@ -105,3 +110,33 @@ class AdminMemberTransactionListAPIView(APIView):
             )
         serializer = TransactionSerializer(transactions, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+class MemberStatsAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, member_id):
+        transactions = Transaction.objects.filter(member_id=member_id)
+
+        if not transactions.exists():
+            return Response(
+                {"detail": "No transactions found for this member."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        share_amount = transactions.filter(
+            source_type='share', direction='in'
+        ).aggregate(total=Sum('amount'))['total'] or 0
+
+        profit = Decimal(share_amount) * Decimal('0.10')  # adjust formula
+        money_in = transactions.filter(direction='in').aggregate(total=Sum('amount'))['total'] or 0
+        money_out = transactions.filter(direction='out').aggregate(total=Sum('amount'))['total'] or 0
+
+        data = {
+            "member_id": member_id,
+            "share_amount": share_amount,
+            "profit": profit,
+            "money_in": money_in,
+            "money_out": money_out,
+        }
+
+        return Response(data, status=status.HTTP_200_OK)
