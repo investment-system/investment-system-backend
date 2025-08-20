@@ -8,7 +8,7 @@ urlpatterns = [
     # Modular app routes
     path('api/transactions/', include('transactions.urls')),
     path('api/', include('registrations.urls')),
-    path('api/', include('shares.urls')),
+    path('api/share/', include('shares.urls')),
     path('api/', include('profits.urls')),
 
     path('api/auth/', include('authentication.urls')),

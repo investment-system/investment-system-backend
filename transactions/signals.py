@@ -18,7 +18,7 @@ def create_share_record_if_needed(sender, instance, created, **kwargs):
             share_date=date.today(),
             expected_share_maturity_date=date.today() + timedelta(days=365),
             share_duration_days=365,
-            status='active'
+            status='pending'
         )
 
         # ✅ Send email notification to the member

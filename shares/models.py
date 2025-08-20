@@ -11,9 +11,10 @@ def default_maturity_date():
 
 class ShareRecord(models.Model):
     STATUS_CHOICES = [
+        ('pending', 'Pending'),
         ('active', 'Active'),
         ('completed', 'Completed'),
-        ('cancelled', 'Cancelled'),
+        ('canceled', 'Canceled'),
     ]
 
     share_id = models.AutoField(primary_key=True)
