@@ -35,5 +35,5 @@ def create_profit_payout(share):
 
 @receiver(post_save, sender=ShareRecord)
 def handle_cancellation_record(sender, instance, **kwargs):
-    if instance.status == 'cancelled':
+    if instance.status == 'canceled':
         CancellationRecord.objects.get_or_create(share=instance)

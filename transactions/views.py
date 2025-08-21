@@ -69,8 +69,7 @@ class TransactionStatsAPIView(APIView):
             'expected_profit': expected_profit,
         }
 
-        serializer = TransactionStatsSerializer(data=data)
-        serializer.is_valid(raise_exception=True)
+        serializer = TransactionStatsSerializer(data)  # ✅ fixed
         return Response(serializer.data)
 
 class UserTransactionsAPIView(APIView):

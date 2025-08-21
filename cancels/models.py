@@ -29,10 +29,8 @@ class CancellationRecord(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
-        # ✅ Always assign member from share
         self.member = self.share.member
 
-        # Step 1: Calculate penalty and refund
         invested_amount = float(self.share.invested_amount)
         rate = float(self.penalty_rate) / 100
         self.penalty_amount = round(rate * invested_amount, 2)
@@ -41,7 +39,6 @@ class CancellationRecord(models.Model):
         is_new = self._state.adding  # check if new instance
 
         if is_new:
-            # Step 2: Generate cancellation code with retry logic
             max_retries = 5
             for attempt in range(max_retries):
                 today_str = timezone.now().strftime("%Y%m%d")
