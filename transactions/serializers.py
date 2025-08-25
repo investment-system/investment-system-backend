@@ -6,10 +6,10 @@ from members.models import Member
 class MemberSerializer(serializers.ModelSerializer):
     class Meta:
         model = Member
-        fields = ['id', 'name', 'email', 'phone']  # only the fields you need
+        fields = ['id', 'name', 'email', 'phone']
 
 class TransactionSerializer(serializers.ModelSerializer):
-    share_record = ShareRecordSerializer(read_only=True, allow_null=True)  # allow null
+    share_record = ShareRecordSerializer(read_only=True, allow_null=True)
 
     class Meta:
         model = Transaction

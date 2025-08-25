@@ -94,7 +94,8 @@ class UserTransactionDetailAPIView(APIView):
             transaction = Transaction.objects.get(pk=pk, member__user=user)
         except Transaction.DoesNotExist:
             return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
-        serializer = TransactionSerializer(transaction)
+
+        serializer = TransactionSerializer(transaction, context={'request': request})
         return Response(serializer.data)
 
 class AdminMemberTransactionListAPIView(APIView):
