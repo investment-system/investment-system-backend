@@ -30,7 +30,6 @@ class Transaction(models.Model):
     transaction_code = models.CharField(max_length=30, unique=True, blank=True, editable=False)
     member = models.ForeignKey(Member, on_delete=models.CASCADE, null=False, blank=False)
     source_type = models.CharField(max_length=50, choices=SOURCE_TYPE_CHOICES)
-    reference_id = models.CharField(max_length=50, blank=True, null=True)
     direction = models.CharField(max_length=15, choices=DIRECTION_CHOICES, default='in')
     amount = models.DecimalField(max_digits=12, decimal_places=2, default=250.00)
     received_invoice_doc = models.FileField(upload_to='received_invoice_doc/', blank=True, null=True)
