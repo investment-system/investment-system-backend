@@ -35,9 +35,6 @@ class Member(models.Model):
     profile_picture = models.ImageField(upload_to='profile_pictures/', blank=True, null=True)
     registration_status = models.CharField(max_length=10, choices=REGISTRATION_STATUS_CHOICES, default='unpaid')
 
-    verification_code = models.CharField(max_length=6, blank=True, null=True)
-    code_created_at = models.DateTimeField(blank=True, null=True)
-
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
