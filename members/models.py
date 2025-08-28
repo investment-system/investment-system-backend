@@ -1,7 +1,6 @@
-from django.db import models
-from authentication.models import User
+from django.db import models, IntegrityError, transaction
 from django.utils import timezone
-from django.db import IntegrityError, transaction
+from authentication.models import User
 
 class Member(models.Model):
     GENDER_CHOICES = (
@@ -19,6 +18,7 @@ class Member(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
     member_code = models.CharField(max_length=30, unique=True, blank=True)
 
+    # Personal Info
     gender = models.CharField(max_length=10, choices=GENDER_CHOICES, default="male")
     ic_number = models.CharField(max_length=255, blank=True, null=True)
     date_of_birth = models.DateField(blank=True, null=True)
@@ -28,18 +28,38 @@ class Member(models.Model):
     city = models.CharField(max_length=100, blank=True, null=True)
     state = models.CharField(max_length=100, blank=True, null=True)
 
+    # Bank Info
     bank_name = models.CharField(max_length=100, blank=True, null=True)
     account_holder_name = models.CharField(max_length=255, blank=True, null=True)
     bank_account_number = models.CharField(max_length=100, blank=True, null=True)
 
+    # Profile Picture
     profile_picture = models.ImageField(upload_to='profile_pictures/', blank=True, null=True)
+
+    # Registration
     registration_status = models.CharField(max_length=10, choices=REGISTRATION_STATUS_CHOICES, default='unpaid')
 
+    # Timestamps
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"{self.user.full_name} ({self.member_code})"
+
+    @property
+    def is_profile_complete(self):
+        required_fields = [
+            self.ic_number,
+            self.date_of_birth,
+            self.phone_number,
+            self.address_line,
+            self.city,
+            self.state,
+            self.bank_name,
+            self.account_holder_name,
+            self.bank_account_number,
+        ]
+        return all(required_fields)
 
     def generate_member_code(self):
         today = timezone.now().strftime("%Y%m%d")
@@ -62,10 +82,8 @@ class Member(models.Model):
 
     @property
     def email(self):
-        """Easy access to the user's email"""
         return self.user.email if hasattr(self, 'user') else None
 
     @property
     def full_name(self):
-        """Easy access to the user's full name"""
         return self.user.full_name if hasattr(self, 'user') else None

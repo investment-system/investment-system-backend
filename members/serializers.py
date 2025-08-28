@@ -13,6 +13,7 @@ class MemberListSerializer(serializers.ModelSerializer):
 class MemberProfileSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(source="user.email", read_only=True)
     full_name = serializers.CharField(source="user.full_name", read_only=True)
+    is_profile_complete = serializers.ReadOnlyField()  # 👈 Add this
 
     class Meta:
         model = Member
@@ -20,7 +21,7 @@ class MemberProfileSerializer(serializers.ModelSerializer):
             'email', 'full_name', 'member_code', 'gender', 'ic_number', 'date_of_birth',
             'phone_number', 'country', 'address_line', 'city', 'state',
             'bank_name', 'account_holder_name', 'bank_account_number',
-            'profile_picture', 'registration_status'
+            'profile_picture', 'registration_status','is_profile_complete'
         ]
         read_only_fields = ['member_code']
 
